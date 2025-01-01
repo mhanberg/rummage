@@ -23,6 +23,7 @@
             # The Nix packages provided in the environment
             packages = with pkgs; [
               git-cliff
+              just
               cargo
               rustc
               rustfmt

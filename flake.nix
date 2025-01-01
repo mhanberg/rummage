@@ -26,6 +26,21 @@
         system,
         ...
       }: {
+        packages.default = let
+          toolchain = fenix.packages.${system}.stable.toolchain;
+        in
+          (pkgs.makeRustPlatform {
+            cargo = toolchain;
+            rustc = toolchain;
+          })
+          .buildRustPackage {
+            pname = "rummage";
+            version = "0.1.0";
+
+            src = ./.;
+
+            cargoLock.lockFile = ./Cargo.lock;
+          };
         devShells = let
           toolchain = with fenix.packages.${system};
             combine [

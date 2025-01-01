@@ -22,6 +22,7 @@
           default = pkgs.mkShell {
             # The Nix packages provided in the environment
             packages = with pkgs; [
+              git-cliff
               cargo
               rustc
               rustfmt

@@ -3,10 +3,18 @@
 
   inputs = {
     flake-parts.url = "github:hercules-ci/flake-parts";
+    fenix = {
+      url = "github:nix-community/fenix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
   };
 
-  outputs = inputs @ {flake-parts, ...}:
+  outputs = inputs @ {
+    flake-parts,
+    fenix,
+    ...
+  }:
     flake-parts.lib.mkFlake {inherit inputs;} {
       imports = [];
       systems = ["x86_64-linux" "aarch64-linux" "aarch64-darwin" "x86_64-darwin"];
@@ -18,15 +26,23 @@
         system,
         ...
       }: {
-        devShells = {
+        devShells = let
+          toolchain = with fenix.packages.${system};
+            combine [
+              stable.rustc
+              stable.cargo
+              targets.x86_64-unknown-linux-musl.stable.rust-std
+              targets.aarch64-apple-darwin.stable.rust-std
+              targets.x86_64-apple-darwin.stable.rust-std
+            ];
+        in {
           default = pkgs.mkShell {
             # The Nix packages provided in the environment
             packages = with pkgs; [
               git-cliff
+              zig
+              toolchain
               just
-              cargo
-              rustc
-              rustfmt
             ];
           };
         };

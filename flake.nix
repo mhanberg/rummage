@@ -12,16 +12,18 @@
 
   outputs = inputs @ {
     flake-parts,
+    self,
     fenix,
     ...
   }:
     flake-parts.lib.mkFlake {inherit inputs;} {
       imports = [];
       systems = ["x86_64-linux" "aarch64-linux" "aarch64-darwin" "x86_64-darwin"];
+      flake = {
+        homeManagerModules.rummage = ./nix/homeManager;
+        homeManagerModules.default = self.homeManagerModules.rummage;
+      };
       perSystem = {
-        config,
-        self',
-        inputs',
         pkgs,
         system,
         ...
